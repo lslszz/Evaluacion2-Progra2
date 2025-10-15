@@ -106,7 +106,43 @@ class AplicacionConPestanas(ctk.CTk):
         self.actualizar_treeview()   
 
     def cargar_csv(self):
-        pass
+        """Carga un archivo CSV y actualiza la interfaz correspondiente"""
+        ruta_archivo = filedialog.askopenfilename(
+            title="Seleccionar archivo CSV de ingredientes",
+            filetypes=[("Archivos CSV", "*.csv"), ("Todos los archivos", "*.*")]
+        )
+        
+        if not ruta_archivo:  # Si el usuario no selecciona un archivo
+            return
+        
+        try:
+            # Cargar el CSV en un DataFrame de pandas
+            self.df_csv = pd.read_csv(ruta_archivo)
+            
+            # Verificar que las columnas coincidan con el formato esperado
+            encabezados_esperados = ['nombre', 'unidad', 'cantidad']
+            if list(self.df_csv.columns) != encabezados_esperados:
+                CTkMessagebox(
+                    title="Error",
+                    message=f"Error: CSV debe tener columnas {encabezados_esperados}",
+                    icon="warning"
+                )
+                return
+            
+            # Mostrar el DataFrame en la tabla
+            self.mostrar_dataframe_en_tabla(self.df_csv)
+            
+            # Habilitar el botón "Agregar al Stock"
+            self.boton_agregar_stock.configure(state="normal")
+            self.boton_agregar_stock.configure(command=self.agregar_csv_al_stock)
+            
+        except Exception as error:
+            CTkMessagebox(
+                title="Error",
+                message=f"Error al cargar: {error}",
+                icon="warning"
+            )
+            self.df_csv = None
         
     def mostrar_dataframe_en_tabla(self, df):
         if self.tabla_csv:
