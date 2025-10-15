@@ -392,13 +392,56 @@ class AplicacionConPestanas(ctk.CTk):
             return False
 
     def ingresar_ingrediente(self):
-        pass
+        # Validar que los campos no estén vacíos
+        nombre = self.entry_nombre.get().strip()
+        unidad = self.combo_unidad.get()
+        cantidad = self.entry_cantidad.get().strip()
+        
+        if not nombre or not unidad or not cantidad:
+            CTkMessagebox(title="Error", message="Todos los campos son obligatorios.", icon="warning")
+            return
+        
+        # Validar el nombre y la cantidad
+        if not self.validar_nombre(nombre):
+            return
+        
+        if not self.validar_cantidad(cantidad):
+            return
+        
+        # Crear el ingrediente y agregarlo al stock
+        ingrediente = Ingrediente(nombre=nombre, unidad=unidad, cantidad=cantidad)
+        self.stock.agregar_ingrediente(ingrediente)
+        
+        # Limpiar los campos
+        self.entry_nombre.delete(0, "end")
+        self.entry_cantidad.delete(0, "end")
+        self.combo_unidad.set("")
+        
+        # Actualizar el treeview
+        self.actualizar_treeview()
+        
+        CTkMessagebox(title="Éxito", message=f"Ingrediente '{nombre}' agregado correctamente.", icon="info")
 
     def eliminar_ingrediente(self):
-        pass
-
-    def actualizar_treeview(self):
-        pass
+        # Obtener el item seleccionado en el treeview
+        seleccionado = self.tree.selection()
+        
+        if not seleccionado:
+            CTkMessagebox(title="Error", message="Selecciona un ingrediente para eliminar.", icon="warning")
+            return
+        
+        # Obtener el nombre del ingrediente seleccionado
+        item = seleccionado[0]
+        valores = self.tree.item(item, "values")
+        nombre_ingrediente = valores[0]
+        
+        # Eliminar del stock
+        self.stock.eliminar_ingrediente(nombre_ingrediente)
+        
+        # Actualizar el treeview
+        self.actualizar_treeview()
+        
+        CTkMessagebox(title="Éxito", message=f"Ingrediente '{nombre_ingrediente}' eliminado correctamente.", icon="info")
 
 
 if __name__ == "__main__":
