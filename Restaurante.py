@@ -329,7 +329,41 @@ class AplicacionConPestanas(ctk.CTk):
             self.menus_creados.add(menu.nombre)
 
     def eliminar_menu(self):
-        pass
+        seleccionado = self.treeview_menu.selection()
+    
+        if not seleccionado:
+            CTkMessagebox(title="Error", message="Selecciona un menú para eliminar.", icon="warning")
+            return
+        
+        # Obtener el nombre del menú seleccionado
+        item = seleccionado[0]
+        valores = self.treeview_menu.item(item, "values")
+        nombre_menu = valores[0]
+        
+        # Buscar el menú en el pedido y eliminarlo
+        menu_a_eliminar = None
+        for menu in self.pedido.menus:
+            if menu.nombre == nombre_menu:
+                menu_a_eliminar = menu
+                break
+        
+        if menu_a_eliminar is None:
+            CTkMessagebox(title="Error", message="No se encontró el menú en el pedido.", icon="warning")
+            return
+        # Devolver los ingredientes al stock
+        for ingrediente_usado in menu_a_eliminar.ingredientes:
+            for ingrediente_stock in self.stock.lista_ingredientes:
+                if ingrediente_stock.nombre == ingrediente_usado.nombre:
+                    ingrediente_stock.cantidad = str(
+                        int(ingrediente_stock.cantidad) + int(ingrediente_usado.cantidad)  * int( menu_a_eliminar.cantidad)
+                    )
+        self.pedido.eliminar_menu(nombre_menu)
+
+        # Recalcular el total
+        self.actualizar_treeview_pedido()
+        self.actualizar_treeview()
+        total = self.pedido.calcular_total()
+        self.label_total.configure(text=f"Total: ${total:.2f}")
 
     def generar_boleta(self):
         pass
