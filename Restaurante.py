@@ -298,7 +298,35 @@ class AplicacionConPestanas(ctk.CTk):
 
     
     def generar_menus(self):
-        pass
+        for widget in tarjetas_frame.winfo_children():
+            widget.destroy()
+
+        self.menus_creados.clear()
+
+        menus_disponibles = []
+        for menu in self.menus:
+            if menu.esta_disponible(self.stock):
+                menus_disponibles.append(menu)
+
+        if not menus_disponibles:
+            label_no_menus = ctk.CTkLabel(
+                tarjetas_frame,
+                text="No hay menús disponibles con los ingredientes actuales",
+                text_color="red",
+                font=("Helvetica", 12)
+            )
+            label_no_menus.pack(pady=20)
+            CTkMessagebox(
+                title="Sin menús disponibles",
+                message="No hay suficientes ingredientes para preparar ningún menú.",
+                icon="warning"
+            )
+            return
+        
+        # Crear tarjetas para cada menú disponible
+        for menu in menus_disponibles:
+            self.crear_tarjeta(menu)
+            self.menus_creados.add(menu.nombre)
 
     def eliminar_menu(self):
         pass
