@@ -67,13 +67,13 @@ class AplicacionConPestanas(ctk.CTk):
         self.tab2 = self.tabview.add("Pedido")
         self.tab5 = self.tabview.add("Boleta")
         
-        self.configurar_pestana1()
-        self.configurar_pestana2()
-        self.configurar_pestana3()
+        self.configurar_pestana_Stock()
+        self.configurar_pestana_Pedido()
+        self.configurar_pestana_csv()
         self._configurar_pestana_crear_menu()
         self._configurar_pestana_ver_boleta()
 
-    def configurar_pestana3(self):
+    def configurar_pestana_csv(self):
         label = ctk.CTkLabel(self.tab3, text="Carga de archivo CSV")
         label.pack(pady=20)
         boton_cargar_csv = ctk.CTkButton(self.tab3, text="Cargar CSV", fg_color="#1976D2", text_color="white",command=self.cargar_csv)
@@ -236,7 +236,7 @@ class AplicacionConPestanas(ctk.CTk):
     def mostrar_boleta(self):
         pass
 
-    def configurar_pestana1(self):
+    def configurar_pestana_Stock(self):
         # Dividir la Pestaña 1 en dos frames
         frame_formulario = ctk.CTkFrame(self.tab1)
         frame_formulario.pack(side="left", fill="both", expand=True, padx=10, pady=10)
@@ -252,7 +252,7 @@ class AplicacionConPestanas(ctk.CTk):
 
         label_cantidad = ctk.CTkLabel(frame_formulario, text="Unidad:")
         label_cantidad.pack(pady=5)
-        self.combo_unidad = ctk.CTkComboBox(frame_formulario, values=["kg", "unid"])
+        self.combo_unidad = ctk.CTkComboBox(frame_formulario, values=["unid"])
         self.combo_unidad.pack(pady=5)
 
         label_cantidad = ctk.CTkLabel(frame_formulario, text="Cantidad:")
@@ -380,7 +380,7 @@ class AplicacionConPestanas(ctk.CTk):
     def generar_boleta(self):
         pass
 
-    def configurar_pestana2(self):
+    def configurar_pestana_Pedido(self):
         frame_superior = ctk.CTkFrame(self.tab2)
         frame_superior.pack(side="top", fill="both", expand=True, padx=10, pady=10)
 
