@@ -183,8 +183,20 @@ class AplicacionConPestanas(ctk.CTk):
         self.pdf_viewer_carta = None
     def generar_y_mostrar_carta_pdf(self):
         try:
+            menus_disponibles = []
+            for menu in self.menus:
+                if menu.esta_disponible(self.stock):
+                    menus_disponibles.append(menu)
+            if not menus_disponibles:
+                CTkMessagebox(
+                    title="Sin menús disponibles", 
+                    message="No hay menús disponibles con el stock actual.", 
+                    icon="warning"
+                )
+                return
+            
             pdf_path = "carta.pdf"
-            create_menu_pdf(self.menus, pdf_path,
+            create_menu_pdf(menus_disponibles, pdf_path,
                 titulo_negocio="Restaurante",
                 subtitulo="Carta Primavera 2025",
                 moneda="$")
