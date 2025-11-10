@@ -15,6 +15,7 @@ from menu_pdf import create_menu_pdf
 from ctk_pdf_viewer import CTkPDFViewer
 import os
 from tkinter.font import nametofont
+from datetime import datetime
 class AplicacionConPestanas(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -233,8 +234,48 @@ class AplicacionConPestanas(ctk.CTk):
         self.pdf_viewer_boleta = None
         
 
-    def mostrar_boleta(self):
-        pass
+    def mostrar_boleta(self, pdf_path: str | None = None):
+        try:
+            # si no se entrega ruta, intentar usar último generado
+            if not pdf_path:
+                archivos = [f for f in os.listdir(os.getcwd()) if f.startswith("boleta_") and f.lower().endswith(".pdf")]
+                if not archivos:
+                    generado = self.generar_boleta()
+                    if not generado:
+                        return
+                    pdf_path = generado
+                else:
+                    archivos.sort()
+                    pdf_path = os.path.abspath(archivos[-1])
+
+        # valida existencia del archivo
+            if not os.path.exists(pdf_path):
+                CTkMessagebox(title="Error", message=f"Archivo no encontrado: {pdf_path}", icon="warning")
+                return
+
+        # comprobar frame destino
+            frame = getattr(self, "pdf_frame_boleta", None)
+            if frame is None:
+                CTkMessagebox(title="Error", message="El contenedor de boleta (pdf_frame_boleta) no existe o no está inicializado.", icon="warning")
+                return
+
+        # destruir viewer anterior si existe
+            if hasattr(self, "pdf_viewer_boleta") and self.pdf_viewer_boleta is not None:
+                try:
+                    self.pdf_viewer_boleta.pack_forget()
+                    self.pdf_viewer_boleta.destroy()
+                except Exception:
+                    pass
+                self.pdf_viewer_boleta = None
+
+            # crear y mostrar nuevo viewer
+            self.pdf_viewer_boleta = CTkPDFViewer(frame, file=pdf_path)
+            self.pdf_viewer_boleta.pack(expand=True, fill="both")
+            frame.update()
+
+        except Exception as e:
+            CTkMessagebox(title="Error", message=f"No se pudo mostrar la boleta.\n{e}", icon="warning")
+
 
     def configurar_pestana_Stock(self):
         # Dividir la Pestaña 1 en dos frames
@@ -378,7 +419,38 @@ class AplicacionConPestanas(ctk.CTk):
         self.label_total.configure(text=f"Total: ${total:.2f}")
 
     def generar_boleta(self):
-        pass
+    # Validaciones básicas
+        if not hasattr(self, "pedido") or not getattr(self.pedido, "menus", None):
+            CTkMessagebox(title="Error", message="El pedido está vacío. Agrega menús antes de generar la boleta.", icon="warning")
+            return None
+
+        try:
+            boletaf = BoletaFacade(self.pedido)
+            boletaf.generar_detalle_boleta()
+
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            pdf_fname = f"boleta_{ts}.pdf"
+            pdf_path = os.path.abspath(pdf_fname)
+
+            creado = boletaf.crear_pdf()  # crea el PDF y devuelve ruta (ej. "boleta.pdf")
+            try:
+                creado_abs = os.path.abspath(creado)
+            except Exception:
+                creado_abs = creado
+
+            if creado_abs != pdf_path:
+                try:
+                    os.replace(creado_abs, pdf_path)
+                except Exception:
+                # si no se puede renombrar, usar el generado
+                    pdf_path = creado_abs
+
+            CTkMessagebox(title="Boleta Generada", message=f"Boleta generada: {os.path.basename(pdf_path)}", icon="info")
+            return pdf_path
+
+        except Exception as e:
+            CTkMessagebox(title="Error", message=f"No se pudo generar la boleta.\n{e}", icon="warning")
+            return None
 
     def configurar_pestana_Pedido(self):
         frame_superior = ctk.CTkFrame(self.tab2)
