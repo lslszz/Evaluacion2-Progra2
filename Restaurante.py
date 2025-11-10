@@ -275,9 +275,13 @@ class AplicacionConPestanas(ctk.CTk):
 
         except Exception as e:
             CTkMessagebox(title="Error", message=f"No se pudo mostrar la boleta.\n{e}", icon="warning")
+<<<<<<< HEAD
 
 
     def configurar_pestana_Stock(self):
+=======
+    def configurar_pestana1(self):
+>>>>>>> 11d7a0479d1216f720382af9de594e7272e863ca
         # Dividir la Pestaña 1 en dos frames
         frame_formulario = ctk.CTkFrame(self.tab1)
         frame_formulario.pack(side="left", fill="both", expand=True, padx=10, pady=10)
@@ -418,7 +422,11 @@ class AplicacionConPestanas(ctk.CTk):
         total = self.pedido.calcular_total()
         self.label_total.configure(text=f"Total: ${total:.2f}")
 
+<<<<<<< HEAD
     def generar_boleta(self):
+=======
+    def generar_boleta(self) -> str | None:
+>>>>>>> 11d7a0479d1216f720382af9de594e7272e863ca
     # Validaciones básicas
         if not hasattr(self, "pedido") or not getattr(self.pedido, "menus", None):
             CTkMessagebox(title="Error", message="El pedido está vacío. Agrega menús antes de generar la boleta.", icon="warning")
@@ -451,8 +459,12 @@ class AplicacionConPestanas(ctk.CTk):
         except Exception as e:
             CTkMessagebox(title="Error", message=f"No se pudo generar la boleta.\n{e}", icon="warning")
             return None
+<<<<<<< HEAD
 
     def configurar_pestana_Pedido(self):
+=======
+    def configurar_pestana2(self):
+>>>>>>> 11d7a0479d1216f720382af9de594e7272e863ca
         frame_superior = ctk.CTkFrame(self.tab2)
         frame_superior.pack(side="top", fill="both", expand=True, padx=10, pady=10)
 
@@ -606,5 +618,6 @@ if __name__ == "__main__":
         style.theme_use("clam")
     except Exception:
         pass
+
 
     app.mainloop()
